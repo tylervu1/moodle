@@ -17,6 +17,7 @@
 namespace mod_quiz;
 
 use core_question\local\bank\question_version_status;
+use mod_quiz\output\view_page;
 use question_engine;
 
 defined('MOODLE_INTERNAL') || die();
@@ -53,7 +54,6 @@ class attempt_test extends \advanced_testcase {
             'grade' => 100.0, 'sumgrades' => 2, 'layout' => $layout, 'navmethod' => $navmethod]);
 
         $quizobj = quiz_settings::create($quiz->id, $user->id);
-
 
         $quba = question_engine::make_questions_usage_by_activity('mod_quiz', $quizobj->get_context());
         $quba->set_preferred_behaviour($quizobj->get_quiz()->preferredbehaviour);
@@ -504,5 +504,44 @@ class attempt_test extends \advanced_testcase {
 
         $this->expectExceptionObject(new \moodle_exception('questiondraftonly', 'mod_quiz', '', $question->name));
         quiz_start_attempt_built_on_last($quba, $newattempt, $attempt);
+    }
+
+    /**
+     * Tests the view_table method in the mod_quiz renderer.
+     * It creates a quiz and an attempt, prepares a viewobj with the created attempt,
+     * uses the mod_quiz renderer to create a table using the prepared viewobj.
+     * The test specifically checks that the generated table contains the expected
+     * caption "Summary of your previous attempts".
+     *
+     * @covers ::view_table
+     * @return void
+     */
+    public function test_view_table_caption(): void {
+        global $PAGE;
+
+        $this->resetAfterTest(true);
+
+        // Create quiz and attempt.
+        $attempt = $this->create_quiz_and_attempt_with_layout('1,2,0');
+        $quiz = $attempt->get_quiz();
+        $context = $attempt->get_context();
+
+        // Create a viewobj.
+        $viewobj = new view_page();
+        $viewobj->attempts = $attempt;
+        $viewobj->attemptobjs[] = new quiz_attempt($attempt->get_attempt(),
+            $quiz, $attempt->get_cm(), $attempt->get_course(), false);
+
+        // Create the renderer.
+        $renderer = $PAGE->get_renderer('mod_quiz');
+
+        // Get the output from view_table.
+        $output = $renderer->view_table($quiz, $context, $viewobj);
+
+        // Prepare the expected output.
+        $expectedcaption = '<caption class="accesshide">' . get_string('summaryofattempts', 'quiz') . '</caption>';
+
+        // Check caption matches expected output.
+        $this->assertStringContainsString($expectedcaption, $output);
     }
 }
