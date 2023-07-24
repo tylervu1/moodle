@@ -22861,9 +22861,19 @@ a.text-dark:hover, a.text-dark:focus {
 .dir-rtl .custom-select {
   background-position: 0.75rem center;
 }
-
 .dir-rtl .custom-switch .custom-control-input:checked ~ .custom-control-label::after {
   transform: translateX(-0.75rem);
+}
+.dir-rtl .tooltip.bs-tooltip-left .arrow, .dir-rtl .tooltip.bs-tooltip-auto[x-placement^=left] .arrow, .dir-rtl .tooltip.bs-tooltip-right .arrow, .dir-rtl .tooltip.bs-tooltip-auto[x-placement^=right] .arrow {
+  transform: rotate(180deg);
+}
+.dir-rtl .tooltip.bs-tooltip-left .arrow, .dir-rtl .tooltip.bs-tooltip-auto[x-placement^=left] .arrow {
+  left: auto;
+  right: 0;
+}
+.dir-rtl .tooltip.bs-tooltip-right .arrow, .dir-rtl .tooltip.bs-tooltip-auto[x-placement^=right] .arrow {
+  left: 0;
+  right: auto;
 }
 
 /**
@@ -23286,8 +23296,15 @@ form.popupform div {
 }
 
 .no-overflow > .generaltable {
-  position: relative;
   margin-bottom: 0;
+}
+
+.no-overflow .generaltable .sr-only,
+.no-overflow .generaltable .accesshide,
+.table-responsive .generaltable .sr-only,
+.table-responsive .generaltable .accesshide {
+  position: relative;
+  display: block;
 }
 
 .accesshide {
@@ -25425,6 +25442,22 @@ input[disabled] {
   visibility: hidden;
 }
 
+.dialog-big {
+  max-width: 500px;
+}
+
+.dialog-small {
+  max-width: 300px;
+}
+
+@media (min-width: 576px) {
+  .dialog-big {
+    width: 500px;
+  }
+  .dialog-small {
+    width: 300px;
+  }
+}
 .emoji-picker {
   width: 350px;
   height: 400px;
@@ -25911,6 +25944,30 @@ blockquote {
   word-break: normal;
   overflow-wrap: anywhere;
   white-space: normal;
+}
+
+/* Showmore component */
+.showmore-container.collapsed .collapsed-content {
+  display: block;
+}
+.showmore-container.collapsed .expanded-content {
+  display: none;
+}
+.showmore-container:not(.collapsed) .collapsed-content {
+  display: none;
+}
+.showmore-container:not(.collapsed) .expanded-content {
+  display: block;
+}
+.showmore-container button {
+  float: right;
+}
+.showmore-container button.btn-link {
+  text-decoration: none;
+}
+.showmore-container button .icon {
+  font-size: 0.8203125rem;
+  margin: 0;
 }
 
 .icon {
@@ -28971,6 +29028,18 @@ span.editinstructions .alert-link {
   background-color: #e9ecef;
   border-radius: 1rem;
 }
+.course-section .availabilityinfo .editavailability {
+  padding: 0.25rem 1rem;
+  border-radius: 1rem;
+}
+.course-section .availabilityinfo .editavailability :hover {
+  background-color: #ced4da;
+}
+.course-section .availabilityinfo .editavailability a {
+  border-radius: 0.5rem;
+  color: #1d2125;
+  text-decoration: none;
+}
 .course-section.section-summary {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -29040,24 +29109,25 @@ span.editinstructions .alert-link {
 .activity-item .activity-grid {
   display: grid;
   align-items: center;
-  grid-template-columns: min-content 1fr min-content min-content;
+  grid-template-columns: min-content 1fr min-content min-content min-content;
   grid-template-rows: 1fr repeat(5, min-content);
-  grid-template-areas: "icon          name          completion    actions" "icon          visibility    completion    actions" "icon          dates         completion    actions" "altcontent    altcontent    altcontent    altcontent" "afterlink     afterlink     afterlink     afterlink" "availability  availability  availability  availability";
+  grid-template-areas: "icon          name          groupmode      completion    actions" "icon          visibility    groupmode      completion    actions" "icon          dates         groupmode      completion    actions" "altcontent    altcontent    altcontent     altcontent    altcontent" "afterlink     afterlink     afterlink      afterlink     afterlink" "availability  availability  availability   availability  availability";
 }
 @media (max-width: 575.98px) {
   .activity-item .activity-grid {
-    grid-template-columns: min-content 1fr min-content;
-    grid-template-areas: "icon          name          actions" "icon          visibility    actions" "dates         dates         dates" "completion    completion    completion" "altcontent    altcontent    altcontent" "afterlink     afterlink     afterlink" "availability  availability  availability";
+    grid-template-columns: min-content 1fr min-content min-content min-content;
+    grid-template-rows: 1fr repeat(4, min-content);
+    grid-template-areas: "icon          name          actions" "icon          visibility    actions" "dates         dates         dates" "groupmode     groupmode     groupmode" "completion    completion    completion" "altcontent    altcontent    altcontent" "afterlink     afterlink     afterlink" "availability  availability  availability";
   }
 }
 .activity-item .activity-grid.noname-grid {
-  grid-template-columns: min-content 1fr min-content;
-  grid-template-areas: "visibility    completion    actions" "altcontent    altcontent    altcontent" "afterlink     afterlink     afterlink" "availability  availability  availability";
+  grid-template-columns: min-content min-content 1fr min-content;
+  grid-template-areas: "visibility    groupmode        completion    actions" "altcontent    altcontent       altcontent    altcontent" "afterlink     afterlink        afterlink     afterlink" "availability  availability     availability  availability";
 }
 @media (max-width: 575.98px) {
   .activity-item .activity-grid.noname-grid {
     grid-template-columns: 1fr min-content;
-    grid-template-areas: "visibility    actions" "altcontent    altcontent" "afterlink     afterlink" "completion    completion" "availability  availability";
+    grid-template-areas: "visibility    actions" "altcontent    altcontent" "groupmode     groupmode" "afterlink     afterlink" "completion    completion" "availability  availability";
   }
 }
 .activity-item .activity-actions {
@@ -29121,6 +29191,38 @@ span.editinstructions .alert-link {
   }
   .activity-item .activity-info button {
     width: 100%;
+  }
+}
+.activity-item .activity-info .completion-dialog {
+  color: #495057;
+  font-size: 0.8203125rem;
+  min-width: 12rem;
+}
+.activity-item .activity-info .completion-dialog .icon {
+  font-size: 0.8203125rem;
+  width: 0.8203125rem;
+  height: 0.8203125rem;
+  margin-right: 0.25rem;
+}
+.activity-item .activity-groupmode-info {
+  grid-area: groupmode;
+  justify-self: end;
+}
+.activity-item .activity-groupmode-info .groupmode-information {
+  height: 31px;
+}
+.activity-item .activity-groupmode-info .groupmode-information .groupmode-icon-info {
+  display: none;
+}
+@media (max-width: 575.98px) {
+  .activity-item .activity-groupmode-info {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #dee2e6;
+  }
+  .activity-item .activity-groupmode-info .groupmode-information .groupmode-icon-info {
+    display: inline;
   }
 }
 .activity-item .activity-badges {
@@ -33764,10 +33866,6 @@ img.userpicture {
     display: none;
   }
 }
-.path-mod-quiz .mod-quiz-edit-content {
-  margin-bottom: 10rem;
-}
-
 #page-mod-quiz-mod #id_reviewoptionshdr .col-md-3,
 #page-mod-quiz-mod #id_reviewoptionshdr .col-md-9 {
   width: auto;
@@ -33883,8 +33981,8 @@ img.userpicture {
 }
 
 #page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer {
-  padding: 0;
-  margin: 0 0.4em;
+  padding: 0.5em 0 0.5em 0.1em;
+  margin: 2px;
 }
 
 /* Countdown timer. */
@@ -34951,9 +35049,6 @@ p.arrow_button {
   border: none;
   vertical-align: middle;
 }
-.path-grade-edit-tree .gradetree-wrapper .setup-grades.generaltable tr td.column-name {
-  padding-left: 38px;
-}
 .path-grade-edit-tree .gradetree-wrapper .setup-grades.generaltable tr td.column-name .small {
   font-size: 70%;
 }
@@ -35050,12 +35145,13 @@ p.arrow_button {
 /**
  * Grader report.
  */
-.path-grade-report-grader .gradeparent {
-  z-index: 5;
-}
 .path-grade-report-grader .gradeparent tr .cell,
 .path-grade-report-grader .gradeparent .floater .cell {
   background-color: #fff;
+}
+.path-grade-report-grader .gradeparent tr .cell.gradecell .dropdown-menu.show,
+.path-grade-report-grader .gradeparent .floater .cell.gradecell .dropdown-menu.show {
+  z-index: 1;
 }
 .path-grade-report-grader .gradeparent table,
 .path-grade-report-grader .gradeparent .cell {
@@ -35072,11 +35168,20 @@ p.arrow_button {
 .path-grade-report-grader .gradeparent tr.heading {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 4;
+}
+.path-grade-report-grader .gradeparent tr.userrow th {
+  z-index: 2;
+}
+.path-grade-report-grader .gradeparent tr.userrow th.actions-menu-active {
+  z-index: 3;
 }
 .path-grade-report-grader .gradeparent tr.lastrow {
   position: sticky;
-  bottom: 0;
+  bottom: -1px;
+}
+.path-grade-report-grader .gradeparent tr.lastrow.pinned {
+  z-index: 4;
 }
 .path-grade-report-grader .gradeparent tr.lastrow td,
 .path-grade-report-grader .gradeparent tr.lastrow th {
@@ -35084,7 +35189,6 @@ p.arrow_button {
 }
 .path-grade-report-grader .gradeparent th.header {
   position: sticky;
-  z-index: 1;
 }
 @media (max-width: 767.98px) {
   .path-grade-report-grader .gradeparent th.header {
@@ -35095,6 +35199,9 @@ p.arrow_button {
   .path-grade-report-grader .gradeparent th.header {
     left: -3rem;
   }
+}
+.path-grade-report-grader .gradeparent th.header#studentheader {
+  z-index: 1;
 }
 .path-grade-report-grader .gradeparent td.noborder {
   border-right: transparent;

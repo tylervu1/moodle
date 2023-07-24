@@ -36,12 +36,12 @@
 }}
 {{#hasmodavailability}}
     {{#info}}
-        <div class="activity-availability availabilityinfo small {{classes}}">
+        <div class="activity-availability availabilityinfo small {{classes}}" data-region="availabilityinfo">
         {{^isrestricted}}
             <span class="badge badge-pill badge-warning">{{{text}}}</span>
         {{/isrestricted}}
         {{#isrestricted}}
-            <div> {{#pix}}t/unlock, core{{/pix}} {{{text}}} </div>
+            {{> core_courseformat/local/content/availability }}
         {{/isrestricted}}
         </div>
     {{/info}}

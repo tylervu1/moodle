@@ -1544,6 +1544,13 @@ $functions = array(
         'type'          => 'read',
         'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],
+    'core_my_view_page' => [
+        'classname'     => '\core_my\external\view_page',
+        'methodname'    => 'execute',
+        'description'   => 'Trigger the My or Dashboard viewed event.',
+        'type'          => 'write',
+        'services'      => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
     'core_notes_create_notes' => array(
         'classname' => 'core_notes_external',
         'methodname' => 'create_notes',
@@ -2918,6 +2925,12 @@ $functions = array(
     'core_reportbuilder_retrieve_report' => [
         'classname'   => 'core_reportbuilder\external\reports\retrieve',
         'description' => 'Retrieve custom report content',
+        'type'        => 'read',
+        'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
+    ],
+    'core_reportbuilder_retrieve_system_report' => [
+        'classname'   => 'core_reportbuilder\external\systemreports\retrieve',
+        'description' => 'Retrieve system report content',
         'type'        => 'read',
         'services'    => [MOODLE_OFFICIAL_MOBILE_SERVICE],
     ],

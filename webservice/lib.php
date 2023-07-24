@@ -397,7 +397,7 @@ class webservice {
         //here retrieve token list (including linked users firstname/lastname and linked services name)
         $sql = "SELECT
                     t.id, t.creatorid, t.name as tokenname, u.firstname, u.lastname,
-                    s.id as wsid, s.name as servicename, s.enabled, s.restrictedusers, t.validuntil
+                    s.id as wsid, s.name as servicename, s.enabled, s.restrictedusers, t.validuntil, t.lastaccess
                 FROM
                     {external_tokens} t, {user} u, {external_services} s
                 WHERE
@@ -413,8 +413,10 @@ class webservice {
      * The returned value is a stdClass:
      * ->id token id
      * ->token
+     * ->tokenname
      * ->firstname user firstname
      * ->lastname
+     * ->externalserviceid
      * ->name service name
      *
      * @param int $userid user id
@@ -424,7 +426,7 @@ class webservice {
     public function get_created_by_user_ws_token($userid, $tokenid) {
         global $DB;
         $sql = "SELECT
-                        t.id, t.token, t.name AS tokenname, u.firstname, u.lastname, s.name
+                        t.id, t.token, t.name AS tokenname, u.firstname, u.lastname, t.externalserviceid, s.name
                     FROM
                         {external_tokens} t, {user} u, {external_services} s
                     WHERE

@@ -420,9 +420,20 @@ form.popupform div {
 
 // Position required for table sizing inside a flex container.
 .no-overflow > .generaltable {
-    position: relative;
     margin-bottom: 0;
 }
+
+.no-overflow,
+.table-responsive {
+    .generaltable {
+        .sr-only,
+        .accesshide {
+            position: relative;
+            display: block;
+        }
+    }
+}
+
 // Accessibility features
 
 // Accessibility: text 'seen' by screen readers but not visual users.
@@ -2613,6 +2624,25 @@ input[disabled] {
     visibility: hidden;
 }
 
+// Any dialog (modal or dropdown) forced max-widths limits.
+.dialog-big {
+    max-width: $modal-md;
+}
+
+.dialog-small {
+    max-width: $modal-sm;
+}
+
+@include media-breakpoint-up(sm) {
+    .dialog-big {
+        width: $modal-md;
+    }
+
+    .dialog-small {
+        width: $modal-sm;
+    }
+}
+
 // Emoji picker.
 $picker-width: 350px !default;
 $picker-width-xs: 320px !default;
@@ -3110,5 +3140,35 @@ blockquote {
         word-break: normal;
         overflow-wrap: anywhere;
         white-space: normal;
+    }
+}
+
+/* Showmore component */
+.showmore-container {
+    &.collapsed {
+        .collapsed-content {
+            display: block;
+        }
+        .expanded-content {
+            display: none;
+        }
+    }
+    &:not(.collapsed) {
+        .collapsed-content {
+            display: none;
+        }
+        .expanded-content {
+            display: block;
+        }
+    }
+    button {
+        float: right;
+        &.btn-link {
+            text-decoration: none;
+        }
+        .icon {
+            font-size: $btn-font-size-sm;
+            margin: 0;
+        }
     }
 }

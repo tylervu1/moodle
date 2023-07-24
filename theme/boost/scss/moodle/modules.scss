@@ -1203,11 +1203,6 @@ img.userpicture {
 }
 
 // Quiz module
-.path-mod-quiz .mod-quiz-edit-content {
-    // Force the quiz edit page to always be large enough to prevent scrolling when accessing the menu.
-    margin-bottom: 10rem;
-}
-
 #page-mod-quiz-mod #id_reviewoptionshdr .col-md-3,
 #page-mod-quiz-mod #id_reviewoptionshdr .col-md-9 {
     width: auto;
@@ -1337,8 +1332,8 @@ img.userpicture {
 }
 
 #page-mod-quiz-edit ul.slots li.section li.activity .instancemaxmarkcontainer {
-    padding: 0;
-    margin: 0 0.4em;
+    padding: 0.5em 0 0.5em 0.1em;
+    margin: 2px;
 }
 
 /* Countdown timer. */
