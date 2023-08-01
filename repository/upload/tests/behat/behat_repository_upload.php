@@ -44,7 +44,8 @@ class behat_repository_upload extends behat_base {
     use core_behat_file_helper;
 
     /**
-     * Uploads a file to the specified filemanager leaving other fields in upload form default. The paths should be relative to moodle codebase.
+     * Uploads a file to the specified filemanager leaving other fields in upload form default. The paths should be relative to
+     * moodle codebase.
      *
      * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager$/
      * @throws DriverException
@@ -57,9 +58,18 @@ class behat_repository_upload extends behat_base {
     }
 
     /**
-     * Uploads a file to the specified filemanager leaving other fields in upload form default and confirms to overwrite an existing file. The paths should be relative to moodle codebase.
+     * @Given /^I select "([^"]*)" in filemanager at "([^"]*)"$/
+     */
+    public function i_select_in_filemanager_at($filepath, $filemanagerelement) {
+        $this->select_file_in_filemanager($filepath, $filemanagerelement);
+    }
+
+    /**
+     * Uploads a file to the specified filemanager leaving other fields in upload form default and confirms to overwrite an existing
+     * file. The paths should be relative to moodle codebase.
      *
-     * @When /^I upload and overwrite "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager$/
+     * @When /^I upload and overwrite "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)"
+     * filemanager$/
      * @throws DriverException
      * @throws ExpectationException Thrown by behat_base::find
      * @param string $filepath
@@ -71,7 +81,8 @@ class behat_repository_upload extends behat_base {
     }
 
     /**
-     * Uploads a file to the specified filemanager and confirms to overwrite an existing file. The paths should be relative to moodle codebase.
+     * Uploads a file to the specified filemanager and confirms to overwrite an existing file. The paths should be relative to
+     * moodle codebase.
      *
      * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager as:$/
      * @throws DriverException
@@ -87,7 +98,9 @@ class behat_repository_upload extends behat_base {
     /**
      * Uploads a file to the specified filemanager. The paths should be relative to moodle codebase.
      *
-     * @When /^I upload and overwrite "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager as:$/
+     * @When /^I upload and overwrite "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)"
+     * filemanager as:$/
+     *
      * @throws DriverException
      * @throws ExpectationException Thrown by behat_base::find
      * @param string $filepath
@@ -182,6 +195,58 @@ class behat_repository_upload extends behat_base {
             $this->getSession()->wait(self::get_timeout(), self::PAGE_READY_JS);
         }
 
+    }
+
+    /**
+     * Selects a file in filemanager but does not upload it
+     *
+     * @throws DriverException
+     * @throws ExpectationException Thrown by behat_base::find
+     * @param string $filepath Normally a path relative to $CFG->dirroot, but can be an absolute path too.
+     * @param string $filemanagerelement
+     */
+    protected function select_file_in_filemanager($filepath, $filemanagerelement) {
+        global $CFG;
+
+        if (!$this->has_tag('_file_upload')) {
+            throw new DriverException('File upload tests must have the @_file_upload tag on either the scenario or feature.');
+        }
+
+        $filemanagernode = $this->get_filepicker_node($filemanagerelement);
+
+        // Opening the select repository window and selecting the upload repository.
+        $this->open_add_file_window($filemanagernode, get_string('pluginname', 'repository_upload'));
+
+        // Ensure all the form is ready.
+        $noformexception = new ExpectationException('The upload file form is not ready', $this->getSession());
+        $this->find(
+            'xpath',
+            "//div[contains(concat(' ', normalize-space(@class), ' '), ' container ')]" .
+            "[contains(concat(' ', normalize-space(@class), ' '), ' repository_upload ')]" .
+            "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' file-picker ')]" .
+            "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-content ')]" .
+            "/descendant::div[contains(concat(' ', normalize-space(@class), ' '), ' fp-upload-form ')]" .
+            "/descendant::form",
+            $noformexception
+        );
+
+        // Form elements to interact with.
+        $file = $this->find_file('repo_upload_file');
+
+        // Attaching specified file to the node.
+        // Replace 'admin/' if it is in start of path with $CFG->admin .
+        if (substr($filepath, 0, 6) === 'admin/') {
+            $filepath = $CFG->dirroot . DIRECTORY_SEPARATOR . $CFG->admin .
+                DIRECTORY_SEPARATOR . substr($filepath, 6);
+        }
+        $filepath = str_replace('/', DIRECTORY_SEPARATOR, $filepath);
+        if (!is_readable($filepath)) {
+            $filepath = $CFG->dirroot . DIRECTORY_SEPARATOR . $filepath;
+            if (!is_readable($filepath)) {
+                throw new ExpectationException('The file to be selected does not exist.', $this->getSession());
+            }
+        }
+        $file->attachFile($filepath);
     }
 
     /**
