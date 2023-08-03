@@ -1841,6 +1841,57 @@ M.core_filepicker.init = function(Y, options) {
                 addClass('fp-object-container');
             content.setContent('').appendChild(container);
         },
+
+        check_file_size: function(file, allowed_size) {
+            if (allowed_size != -1 && file.size > allowed_size) {
+                this.print_msg(M.util.get_string('maxbytesfile', 'error', {
+                    file: file.name,
+                    size: allowed_size
+                }), 'error');
+                return false;
+            }
+            return true;
+        },
+        check_file_type: function(file, allowed_type) {
+            // Get file extension.
+            var extension = '.' + file.name.split('.').pop().toLowerCase();
+
+            // Check file type.
+            if (allowed_type.length === 0 || (allowed_type.length === 1 && allowed_type[0] === "*")) {
+                // All file types are allowed, so return true.
+                return true;
+            } else {
+                if (allowed_type.indexOf(extension) === -1) {
+                    this.print_msg(M.util.get_string('invalidfiletype', 'error', file.name), 'error');
+                    return false;
+                }
+            }
+            return true;
+        },
+        delegateChangeEvent: function() {
+            var scope = this;
+            this.fpnode.delegate('change', function(e) {
+                var inputElement = e.currentTarget;
+
+                if (e._event.target.files.length) {
+                    var file = e._event.target.files[0];
+
+                    var isSizeValid = scope.check_file_size(file, scope.options.maxbytes);
+                    var isTypeValid = scope.check_file_type(file, scope.options.accepted_types);
+
+                    if (!isSizeValid || !isTypeValid) {
+                        // Create a new input element to replace the old one.
+                        var newFileInput = Y.Node.create('<input type="file"/>');
+
+                        // Set the name of the new input element to match the old one.
+                        newFileInput.set('name', inputElement.get('name'));
+
+                        // Replace the old file input with the new one.
+                        inputElement.replace(newFileInput);
+                    }
+                }
+            }, '.fp-file input[type="file"]');
+        },
         create_upload_form: function(data) {
             var client_id = this.options.client_id;
             var id = data.upload.id+'_'+client_id;
@@ -1870,63 +1921,11 @@ M.core_filepicker.init = function(Y, options) {
                     setAttrs({type:'hidden',name:'accepted_types[]',value:types[i]}));
             }
 
-            var scope = this;
-
-            // Define the function that will attach the 'change' event.
-            var bindChangeEvent = function(inputElement) {
-                inputElement.on('change', function(e) {
-                    if (e._event.target.files.length) {
-                        var file = e._event.target.files[0];
-                        var isvalid = true;
-
-                        // Get file extension.
-                        var extension = '.' + file.name.split('.').pop().toLowerCase();
-
-                        // Define allowed file size and types.
-                        var allowed_size = scope.options.maxbytes;
-                        var allowed_type = scope.options.accepted_types;
-
-                        // Check file size.
-                        if (allowed_size != -1 && file.size > allowed_size) {
-                            scope.print_msg(M.util.get_string('maxbytesfile', 'error', {
-                                file: file.name,
-                                size: allowed_size
-                            }), 'error');
-                            isvalid = false;
-                        }
-
-                        // Check file type.
-                        if (allowed_type.length === 0 || (allowed_type.length === 1 && allowed_type[0] === "*")) {
-                            // All file types are allowed, so skip the file type check.
-                        } else {
-                            if (allowed_type.indexOf(extension) === -1) {
-                                scope.print_msg(M.util.get_string('invalidfiletype', 'error', file.name), 'error');
-                                isvalid = false;
-                            }
-                        }
-
-                        if (!isvalid) {
-                            // Create a new input element to replace the old one.
-                            var newFileInput = Y.Node.create('<input type="file"/>');
-
-                            // Set the name of the new input element to match the old one.
-                            newFileInput.set('name', inputElement.get('name'));
-
-                            // Replace the old file input with the new one.
-                            inputElement.replace(newFileInput);
-
-                            // Call the function to attach the 'change' event to the new file input.
-                            bindChangeEvent(newFileInput);
-
-                            return;
-                        }
-                    }
-                });
-            }
-
             // Call the function to bind the 'change' event to the initial file input.
-            bindChangeEvent(content.one('.fp-file input[type="file"]'));
+            this.delegateChangeEvent();
 
+            var scope = this;
+            
             content.one('.fp-upload-btn').on('click', function(e) {
                 e.preventDefault();
                 var license = content.one('.fp-setlicense select');

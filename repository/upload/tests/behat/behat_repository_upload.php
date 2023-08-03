@@ -44,8 +44,7 @@ class behat_repository_upload extends behat_base {
     use core_behat_file_helper;
 
     /**
-     * Uploads a file to the specified filemanager leaving other fields in upload form default. The paths should be relative to
-     * moodle codebase.
+     * Uploads a file to the specified filemanager leaving other fields in upload form default. The paths should be relative to moodle codebase.
      *
      * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager$/
      * @throws DriverException
@@ -58,18 +57,9 @@ class behat_repository_upload extends behat_base {
     }
 
     /**
-     * @Given /^I select "([^"]*)" in filemanager at "([^"]*)"$/
-     */
-    public function i_select_in_filemanager_at($filepath, $filemanagerelement) {
-        $this->select_file_in_filemanager($filepath, $filemanagerelement);
-    }
-
-    /**
-     * Uploads a file to the specified filemanager leaving other fields in upload form default and confirms to overwrite an existing
-     * file. The paths should be relative to moodle codebase.
+     * Uploads a file to the specified filemanager leaving other fields in upload form default and confirms to overwrite an existing file. The paths should be relative to moodle codebase.
      *
-     * @When /^I upload and overwrite "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)"
-     * filemanager$/
+     * @When /^I upload and overwrite "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager$/
      * @throws DriverException
      * @throws ExpectationException Thrown by behat_base::find
      * @param string $filepath
@@ -81,8 +71,7 @@ class behat_repository_upload extends behat_base {
     }
 
     /**
-     * Uploads a file to the specified filemanager and confirms to overwrite an existing file. The paths should be relative to
-     * moodle codebase.
+     * Uploads a file to the specified filemanager and confirms to overwrite an existing file. The paths should be relative to moodle codebase.
      *
      * @When /^I upload "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager as:$/
      * @throws DriverException
@@ -98,9 +87,7 @@ class behat_repository_upload extends behat_base {
     /**
      * Uploads a file to the specified filemanager. The paths should be relative to moodle codebase.
      *
-     * @When /^I upload and overwrite "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)"
-     * filemanager as:$/
-     *
+     * @When /^I upload and overwrite "(?P<filepath_string>(?:[^"]|\\")*)" file to "(?P<filemanager_field_string>(?:[^"]|\\")*)" filemanager as:$/
      * @throws DriverException
      * @throws ExpectationException Thrown by behat_base::find
      * @param string $filepath
@@ -110,6 +97,13 @@ class behat_repository_upload extends behat_base {
     public function i_upload_and_overwrite_file_to_filemanager_as($filepath, $filemanagerelement, TableNode $data) {
         $this->upload_file_to_filemanager($filepath, $filemanagerelement, $data,
                 get_string('overwrite', 'repository'));
+    }
+
+    /**
+     * @Given /^I select "([^"]*)" in filemanager at "([^"]*)"$/
+     */
+    public function i_select_in_filemanager_at($filepath, $filemanagerelement) {
+        $this->select_file_in_filemanager($filepath, $filemanagerelement);
     }
 
     /**
@@ -198,6 +192,40 @@ class behat_repository_upload extends behat_base {
     }
 
     /**
+     * Try to get the filemanager node specified by the element
+     *
+     * @param string $filepickerelement
+     * @return \Behat\Mink\Element\NodeElement
+     * @throws ExpectationException
+     */
+    protected function get_filepicker_node($filepickerelement) {
+
+        // More info about the problem (in case there is a problem).
+        $exception = new ExpectationException('"' . $filepickerelement . '" filepicker can not be found', $this->getSession());
+
+        // If no file picker label is mentioned take the first file picker from the page.
+        if (empty($filepickerelement)) {
+            $filepickercontainer = $this->find(
+                    'xpath',
+                    "//*[@class=\"form-filemanager\"]",
+                    $exception
+            );
+        } else {
+            // Gets the filemanager node specified by the locator which contains the filepicker container
+            // either for filepickers created by mform or by admin config.
+            $filepickerelement = behat_context_helper::escape($filepickerelement);
+            $filepickercontainer = $this->find(
+                    'xpath',
+                    "//input[./@id = substring-before(//p[normalize-space(.)=$filepickerelement]/@id, '_label')]" .
+                    "//ancestor::*[@data-fieldtype = 'filemanager' or @data-fieldtype = 'filepicker']",
+                    $exception
+            );
+        }
+
+        return $filepickercontainer;
+    }
+
+    /**
      * Selects a file in filemanager but does not upload it
      *
      * @throws DriverException
@@ -248,39 +276,4 @@ class behat_repository_upload extends behat_base {
         }
         $file->attachFile($filepath);
     }
-
-    /**
-     * Try to get the filemanager node specified by the element
-     *
-     * @param string $filepickerelement
-     * @return \Behat\Mink\Element\NodeElement
-     * @throws ExpectationException
-     */
-    protected function get_filepicker_node($filepickerelement) {
-
-        // More info about the problem (in case there is a problem).
-        $exception = new ExpectationException('"' . $filepickerelement . '" filepicker can not be found', $this->getSession());
-
-        // If no file picker label is mentioned take the first file picker from the page.
-        if (empty($filepickerelement)) {
-            $filepickercontainer = $this->find(
-                    'xpath',
-                    "//*[@class=\"form-filemanager\"]",
-                    $exception
-            );
-        } else {
-            // Gets the filemanager node specified by the locator which contains the filepicker container
-            // either for filepickers created by mform or by admin config.
-            $filepickerelement = behat_context_helper::escape($filepickerelement);
-            $filepickercontainer = $this->find(
-                    'xpath',
-                    "//input[./@id = substring-before(//p[normalize-space(.)=$filepickerelement]/@id, '_label')]" .
-                    "//ancestor::*[@data-fieldtype = 'filemanager' or @data-fieldtype = 'filepicker']",
-                    $exception
-            );
-        }
-
-        return $filepickercontainer;
-    }
-
 }
